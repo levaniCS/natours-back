@@ -7,6 +7,19 @@ const router = express.Router();
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
 
+router.post('/forgotPassword', authController.forgotPassword);
+router.patch('/resetPassword/:token', authController.resetPassword);
+
+router.patch(
+  '/updateMyPassword',
+  authController.protect,
+  authController.updatePassword
+);
+
+// protect middleware creates user object (req.user)
+router.patch('/updateme', authController.protect, userController.updateMe);
+router.delete('/deleteme', authController.protect, userController.deleteMe);
+
 router
   .route('/')
   .get(userController.getAllUsers)
