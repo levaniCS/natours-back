@@ -10,15 +10,18 @@ router.post('/login', authController.login);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
-router.patch(
-  '/updateMyPassword',
-  authController.protect,
-  authController.updatePassword
-);
+// 👇 all middlewares after this one, will be PROTECTED (Needs Authentication)
+router.use(authController.protect);
+
+router.patch('/updateMyPassword', authController.updatePassword);
 
 // protect middleware creates user object (req.user)
-router.patch('/updateme', authController.protect, userController.updateMe);
-router.delete('/deleteme', authController.protect, userController.deleteMe);
+router.get('/me', userController.getMe, userController.getUser);
+router.patch('/updateme', userController.updateMe);
+router.delete('/deleteme', userController.deleteMe);
+
+// Only admin can [...CRUD] user data
+router.use(authController.restrictTo('admin'));
 
 router
   .route('/')
