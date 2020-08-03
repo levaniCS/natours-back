@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
+const factory = require('./handlerFactory');
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -72,17 +73,6 @@ exports.createUser = (req, res) => {
   });
 };
 
-// For Admin to update all users
-exports.updateUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined !',
-  });
-};
-
-exports.deleteUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined !',
-  });
-};
+// For Admin to update all users, DO NOT UPDATE PASSWORDS WITH THIS
+exports.updateUser = factory.updateOne(User);
+exports.deleteUser = factory.deleteOne(User);
