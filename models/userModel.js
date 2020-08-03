@@ -71,9 +71,8 @@ userSchema.pre('save', function (next) {
   next();
 });
 
-userSchema.pre('/^find/', function (next) {
+userSchema.pre(/^find/, function (next) {
   //THIS POINTS TO CURR QUERY
-
   // Return users only which are active
   this.find({ active: { $ne: false } });
   next();

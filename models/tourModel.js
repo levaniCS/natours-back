@@ -134,6 +134,14 @@ tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
+//Virtual populate -> every tour should not its reviews
+//(besides this reviews aren't in same collection)
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id',
+});
+
 //! (1) DOOCUMENT MIDDLEWARE: runs before .save() and .create() only!
 // this refers to document
 tourSchema.pre('save', function (next) {
@@ -183,8 +191,11 @@ tourSchema.pre(/^find/, function (next) {
   //This points current query ()
   this.populate({
     path: 'guides',
+    // Not Include
     select: '-__v -passwordChangedAt',
   });
+
+  next();
 });
 
 tourSchema.post(/^find/, function (doc, next) {
