@@ -39,6 +39,8 @@ const tourSchema = new mongoose.Schema(
       default: 4.5,
       min: [1, 'Rating must be above 1.0'],
       max: [5, 'Rating  must be below 5.0'],
+      // This will run each time there is new value in ratingsAverage
+      set: (val) => Math.round(val * 10), //
     },
     ratingsQuantity: {
       type: Number,
@@ -128,6 +130,16 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+// პოვნის დროს პერფორმანსისთვის
+// მაგ 3 აითემის საპოვნელად 3დოკუმენტი რო შეამოწმოს და არა ყველა მაგალითად
+// 1 - sorting ascending(ზრდადობით) order and -1 means descending(კლებადობით) order indexes
+// tourSchema.index({ price: 1 });
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
+
+// 2D sphere index it describes data in real points on earth
+tourSchema.index({ startLocation: '2dsphere' });
+
 // We can't use virtual property as query because it's not part of DB
 // tour.find({durationWeek: {$gt: 1}}) not gonna work
 tourSchema.virtual('durationWeeks').get(function () {
@@ -204,16 +216,16 @@ tourSchema.post(/^find/, function (doc, next) {
 });
 
 //! (3) AGGREGATION MIDDLEWARE: this refers to aggregation object
-tourSchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({
-    $match: {
-      sectretTour: {
-        $ne: true,
-      },
-    },
-  });
-  next();
-});
+// tourSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({
+//     $match: {
+//       sectretTour: {
+//         $ne: true,
+//       },
+//     },
+//   });
+//   next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 
