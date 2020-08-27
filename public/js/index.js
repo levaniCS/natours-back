@@ -1,6 +1,7 @@
 import { login, logout } from './login';
 import { displayMap } from './mapBox';
 import { updateSettings } from './updateSettings';
+import { bookTour } from './stripe';
 
 // DOM ELEMENTS
 const mapBox = document.getElementById('map');
@@ -8,15 +9,16 @@ const loginForm = document.querySelector('.login-form');
 const logoutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
+const bookButton = document.getElementById('book-tour');
 
 // DELEGATION
 if (mapBox) {
+  //! FIRST WAY TO GET DATA FROM HTML TO JS (DATA)
   const locations = JSON.parse(mapBox.dataset.locations);
   displayMap(locations);
 }
 
 if (loginForm) {
-  console.log('yes', loginForm);
   loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -61,3 +63,15 @@ if (userPasswordForm) {
     document.getElementById('password-confirm').value = '';
   });
 }
+
+if (bookButton)
+  bookButton.addEventListener('click', (e) => {
+    e.target.textContent = 'Processing...';
+
+    //! SECOND WAY TO GET DATA FROM HTML TO JS (DATA)
+    const { tourId } = e.target.dataset;
+
+    bookTour(tourId);
+  });
+
+// id = tour-id it converts automatically camelCase notation as tourId

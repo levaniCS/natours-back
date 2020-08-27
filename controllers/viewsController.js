@@ -1,4 +1,5 @@
 const Tour = require('../models/tourModel');
+const Booking = require('../models/bookingModel');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
@@ -15,7 +16,6 @@ exports.getTour = catchAsync(async (req, res, next) => {
   });
 
   if (!tour) {
-    console.log('no tour');
     return next(new AppError('There is no tour with that name', 404));
   }
 
@@ -54,5 +54,20 @@ exports.updateUserData = catchAsync(async (req, res, next) => {
   res.status(200).render('account', {
     title: 'Your account',
     user: updatedUser,
+  });
+});
+
+exports.getMyTours = catchAsync(async (req, res, next) => {
+  // 1) Find all bookings
+  const bookings = await Booking.find({ user: req.user.id });
+
+  // 2) Find tours with the returned ids
+  const tourIDs = bookings.map((el) => el.tour);
+  // selects all tours which has tourIds 'in' _id field
+  const tours = await Tour.find({ _id: { $in: tourIDs } });
+
+  res.status(200).render('overview', {
+    title: 'My Tours',
+    tours,
   });
 });
