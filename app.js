@@ -20,6 +20,9 @@ const bookingRoutes = require('./routes/bookingRoutes');
 
 const app = express();
 
+// Authcontroller 👉 x-forwarded-proto works if this is set
+app.enable('trust proxy');
+
 // PUG Config (needs to instal pug: npm i pug)
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));

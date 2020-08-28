@@ -12,20 +12,18 @@ const signToken = (id) => {
   });
 };
 
-const createSendToken = (user, statusCode, res) => {
+const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id);
-  const cookieOptions = {
+  // Express has secure when conection when requet is secure (second part is for HEROKU)
+  res.cookie('jwt', token, {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000 // convert to ms
     ),
-    // only using cookie in https protocol
-    // secure: true,
     // cookie cant be modified by the browser
     httpOnly: true,
-  };
-
-  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
-  res.cookie('jwt', token, cookieOptions);
+    // only using cookie in https protocol
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+  });
 
   user.password = undefined;
 
@@ -48,7 +46,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   const url = `${req.protocol}://${req.get('host')}/me`;
   await new Email(newUser, url).sendWelcome();
-  createSendToken(newUser, 201, res);
+  createSendToken(newUser, 201, req, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -68,7 +66,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) If everything's ok, send token to client
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 });
 
 // Send invalid cookie to override existing one
@@ -235,7 +233,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   //! this we set is schema
 
   // 4) Log the user in, send JWT
-  createSendToken(user, 201, res);
+  createSendToken(user, 201, req, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
@@ -253,5 +251,5 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // 4) Log user in, send JWT
-  createSendToken(user, 201, res);
+  createSendToken(user, 201, req, res);
 });

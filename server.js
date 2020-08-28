@@ -41,3 +41,11 @@ process.on('unhandledRejection', (err) => {
     process.exit(1); // 1 - uncode exception
   });
 });
+
+// For not to shut down out application on heroku every 24hours
+process.on('SIGTERM', () => {
+  console.log('SIGTERM RECIEVED. Shutting down gracefully 🙂');
+  server.close(() => {
+    console.log('🔥 Process terminated!');
+  });
+});
