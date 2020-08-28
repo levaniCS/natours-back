@@ -3,55 +3,64 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const fs = require('fs');
 
-const Tour = require('../../models/tourModel')
+const Tour = require('../../models/tourModel');
+const Review = require('../../models/reviewModel');
+const User = require('../../models/userModel');
 
 //for defining enviroment variables
 dotenv.config({
-   path: './config.env',
+  path: './config.env',
 });
 
 const DB = process.env.DATABASE.replace(
-   '<PASSWORD>',
-   process.env.DATABASE_PASSWORD
+  '<PASSWORD>',
+  process.env.DATABASE_PASSWORD
 );
 
 mongoose
-   .connect(DB, {
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useFindAndModify: false,
-      useUnifiedTopology: true,
-   })
-   .then(() => console.log('DB connection successful!'));
+  .connect(DB, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log('DB connection successful!'));
 
 // READ JSON FILE
-const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-8'));
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
+const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, 'utf-8'));
+const reviews = JSON.parse(
+  fs.readFileSync(`${__dirname}/reviews.json`, 'utf-8')
+);
 
 // IMPORT DATA INTO DB
 const importData = async () => {
-   try {
-      await Tour.create(tours);
-      console.log("DATA SUCCESSFULLY LOADED")
-   } catch (err) {
-      console.log(err)
-   }
-   process.exit()
-}
-
+  try {
+    await Tour.create(tours);
+    await User.create(users, { validateBeforeSave: false });
+    await Review.create(reviews);
+    console.log('DATA SUCCESSFULLY LOADED');
+  } catch (err) {
+    console.log(err);
+  }
+  process.exit();
+};
 
 // DELETE ALL DATA FROM COLLECTION
 const deleteData = async () => {
-   try {
-      await Tour.deleteMany();
-      console.log("DATA SUCCESSFULLY Deleted")
-   } catch (err) {
-      console.log(err)
-   }
-   process.exit()
-}
+  try {
+    await Tour.deleteMany();
+    await User.deleteMany();
+    await Review.deleteMany();
+    console.log('DATA SUCCESSFULLY Deleted');
+  } catch (err) {
+    console.log(err);
+  }
+  process.exit();
+};
 
 if (process.argv[2] === '--import') {
-   importData()
+  importData();
 } else if (process.argv[2] === '--delete') {
-   deleteData()
+  deleteData();
 }
