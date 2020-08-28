@@ -13,6 +13,7 @@ const cors = require('cors');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 
+const bookingController = require('./controllers/bookingController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
@@ -63,6 +64,14 @@ const limiter = rateLimit({
 
 //Every routes which starts witch api url will be limited
 app.use('/api', limiter);
+
+// this puts stream in body and above middleware
+// express.json converts it into JSON
+app.post(
+  '/webhook-checkout',
+  express.raw({ type: 'application/json' }),
+  bookingController.webhookCheckout
+);
 
 // middleware - function that can modify incoming data
 // middle -- between the request and the response
