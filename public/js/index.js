@@ -1,4 +1,5 @@
 import { login, logout } from './login';
+import { signup } from './signup';
 import { displayMap } from './mapBox';
 import { updateSettings } from './updateSettings';
 import { bookTour } from './stripe';
@@ -11,6 +12,8 @@ const logoutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 const bookButton = document.getElementById('book-tour');
+
+const signupForm = document.querySelector('.signup-form');
 
 // DELEGATION
 if (mapBox) {
@@ -78,3 +81,21 @@ if (bookButton)
 // id = tour-id it converts automatically camelCase notation as tourId
 const alertMessage = document.querySelector('body').dataset.alert;
 if (alertMessage) showAlert('success', alertMessage, 15);
+
+if (signupForm) {
+  signupForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const form = new FormData();
+    form.append('name', document.getElementById('name').value);
+    form.append('email', document.getElementById('email').value);
+    form.append('photo', document.getElementById('photo').files[0]);
+    form.append('password', document.getElementById('password').value);
+    form.append(
+      'passwordConfirm',
+      document.getElementById('passwordConfirm').value
+    );
+
+    signup(form);
+  });
+}

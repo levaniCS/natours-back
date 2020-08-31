@@ -1,5 +1,6 @@
 const multer = require('multer');
 const sharp = require('sharp');
+const { uuid } = require('uuidv4');
 const User = require('../models/userModel');
 
 const catchAsync = require('../utils/catchAsync');
@@ -38,7 +39,9 @@ exports.uploadUserPhoto = upload.single('photo');
 
 exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
-  req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
+  req.file.filename = `user-${
+    req.user ? req.user.id : uuid()
+  }-${Date.now()}.jpeg`;
 
   await sharp(req.file.buffer)
     .resize(500, 500)

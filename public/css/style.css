@@ -1322,3 +1322,9 @@ body {
   -webkit-transform: translateY(-2px);
   transform: translateY(-2px);
 }
+
+.form_upload_label {
+  padding: 1rem 0 0 0;
+  margin: 2rem 0 0 0;
+  border: none;
+}

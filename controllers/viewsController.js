@@ -14,7 +14,7 @@ exports.alerts = (req, res, next) => {
 
 exports.getOverview = catchAsync(async (req, res, next) => {
   const tours = await Tour.find();
-  res.status(200).render('overview', { tours });
+  res.status(200).render('overview', { tours, title: 'Home' });
 });
 
 exports.getTour = catchAsync(async (req, res, next) => {
@@ -36,6 +36,12 @@ exports.getTour = catchAsync(async (req, res, next) => {
 exports.getLoginForm = (req, res) => {
   res.status(200).render('login', {
     title: 'Log into your account',
+  });
+};
+
+exports.getSignupForm = (req, res) => {
+  res.status(200).render('signup', {
+    title: 'Register',
   });
 };
 

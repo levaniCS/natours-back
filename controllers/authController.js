@@ -36,13 +36,12 @@ const createSendToken = (user, statusCode, req, res) => {
 
 exports.signup = catchAsync(async (req, res, next) => {
   const { name, email, password, passwordConfirm, role } = req.body;
-  const newUser = await User.create({
-    name,
-    email,
-    password,
-    passwordConfirm,
-    role,
-  });
+
+  const data = { name, email, password, passwordConfirm, role };
+
+  if (req.file) data.photo = req.file.filename;
+
+  const newUser = await User.create(data);
 
   const url = `${req.protocol}://${req.get('host')}/me`;
   await new Email(newUser, url).sendWelcome();
